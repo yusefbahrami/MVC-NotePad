@@ -39,6 +39,7 @@ class MainWindow(QMainWindow):
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
 
+    # test function
     def onMyToolBarButtonClick(self):
 
         print(self.widget.txtDisplay.toPlainText())
