@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QWidget, QGridLayout, QToolBar, QAction, QStatusBar
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIcon
+from CentralWidget import CentralWidget
 
 
 class MainWindow(QMainWindow):
@@ -33,30 +34,17 @@ class MainWindow(QMainWindow):
         self.helpStripMenuItem.triggered.connect(self.onMyToolBarButtonClick)
         self.toolbar.addAction(self.helpStripMenuItem)
 
-        self.widget = CentralWidget()
-        self.setCentralWidget(self.widget)
-
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
+
+        self.widget = CentralWidget()
+        self.setCentralWidget(self.widget)
 
     # test function
     def onMyToolBarButtonClick(self):
 
         print(self.widget.txtDisplay.toPlainText())
         # .toPlainText() -> is a method to access the text of the QTextEdit
-
-
-class CentralWidget(QWidget):
-    def __init__(self) -> None:
-        super().__init__()
-        self.font = QFont("vazir", 12)
-
-        layout = QGridLayout()
-        self.setLayout(layout)
-
-        self.txtDisplay = QTextEdit()
-        self.txtDisplay.setFont(self.font)
-        layout.addWidget(self.txtDisplay, 0, 0)
 
 
 # test
