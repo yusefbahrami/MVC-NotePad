@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QWidget, QGridLayout, QToolBar, QAction, QStatusBar
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtWidgets import QApplication, QMainWindow, QToolBar, QAction, QStatusBar
+from PyQt5.QtGui import QFont
 from CentralWidget import CentralWidget
 
 
