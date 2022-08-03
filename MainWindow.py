@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QToolBar, QAction, QStatusBar
-from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QStatusBar, QFileDialog
+from PyQt5.QtGui import QFont, QKeySequence
 from CentralWidget import CentralWidget
 
 
@@ -11,28 +11,14 @@ class MainWindow(QMainWindow):
         self.setFont(self.font)
         self.setMinimumSize(300, 300)
 
-        self.toolbar = QToolBar("main toolbar")
-        self.addToolBar(self.toolbar)
+        self.menu = self.menuBar()
 
-        self.fileStripMenuItem = QAction("File", self)
-        self.fileStripMenuItem.setToolTip("File Strip Menu Item")
-        self.fileStripMenuItem.triggered.connect(self.onMyToolBarButtonClick)
-        self.toolbar.addAction(self.fileStripMenuItem)
+        self.saveToolStripMenuItem = QAction("Save", self)
+        self.saveToolStripMenuItem.setShortcut(QKeySequence("ctrl+s"))
+        self.saveToolStripMenuItem.triggered.connect(self.saveMenu)
 
-        self.editStripMenuItem = QAction("Edit", self)
-        self.editStripMenuItem.setToolTip("Edit Strip Menu Item")
-        self.editStripMenuItem.triggered.connect(self.onMyToolBarButtonClick)
-        self.toolbar.addAction(self.editStripMenuItem)
-
-        self.viewStripMenuItem = QAction("View", self)
-        self.viewStripMenuItem.setToolTip("View Strip Menu Item")
-        self.viewStripMenuItem.triggered.connect(self.onMyToolBarButtonClick)
-        self.toolbar.addAction(self.viewStripMenuItem)
-
-        self.helpStripMenuItem = QAction("Help", self)
-        self.helpStripMenuItem.setToolTip("Help Strip Menu Item")
-        self.helpStripMenuItem.triggered.connect(self.onMyToolBarButtonClick)
-        self.toolbar.addAction(self.helpStripMenuItem)
+        self.fileToolStripMenu = self.menu.addMenu("&File")
+        self.fileToolStripMenu.addAction(self.saveToolStripMenuItem)
 
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
@@ -40,7 +26,14 @@ class MainWindow(QMainWindow):
         self.widget = CentralWidget()
         self.setCentralWidget(self.widget)
 
+    # test
+
+    def saveMenu(self):
+        fname = QFileDialog.getOpenFileName(self, 'Open file', 
+         'c:\\',"Image files (*.jpg *.gif)")
+        print(fname)
     # test function
+
     def onMyToolBarButtonClick(self):
 
         print(self.widget.txtDisplay.toPlainText())
