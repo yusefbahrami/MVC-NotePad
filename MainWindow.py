@@ -13,16 +13,8 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(300, 300)
         self.resize(600, 400)
         self.speakObject = speakObject
+        self.toolStripMenu()
 
-        self.menu = self.menuBar()
-
-        self.saveToolStripMenuItem = QAction("Save", self)
-        self.saveToolStripMenuItem.setShortcut(QKeySequence("ctrl+s"))
-        self.saveToolStripMenuItem.triggered.connect(
-            self.onMyToolBarButtonClick)
-
-        self.fileToolStripMenu = self.menu.addMenu("&File")
-        self.fileToolStripMenu.addAction(self.saveToolStripMenuItem)
         # self.fileToolStripMenu.triggered.connect(self.onMyToolBarButtonClick)
 
         self.statusBar = QStatusBar()
@@ -31,24 +23,23 @@ class MainWindow(QMainWindow):
         self.widget = CentralWidget()
         self.setCentralWidget(self.widget)
 
+    def toolStripMenu(self):
+        self.menu = self.menuBar()
+
+        self.saveToolStripMenuItem = QAction("Save", self)
+        self.saveToolStripMenuItem.setShortcut(QKeySequence("ctrl+s"))
+        self.saveToolStripMenuItem.triggered.connect(
+            self.speakMethod)
+
+        self.fileToolStripMenu = self.menu.addMenu("&File")
+        self.fileToolStripMenu.addAction(self.saveToolStripMenuItem)
+
     # test
     def saveMenu(self):
-        fname = QFileDialog.getOpenFileName(self, 'Open file',
-                                            'c:\\', "Image files (*.jpg *.gif)")
-        print(fname)
+        pass
 
-    # test function
-    def onMyToolBarButtonClick(self):
+    
+    def speakMethod(self):
         print(self.widget.txtDisplay.toPlainText())
         self.speakObject.setText(self.widget.txtDisplay.toPlainText())
         self.speakObject.start()
-        # self.speakObject.start()
-        # self.speakObject.speaker.speak()
-        # .toPlainText() -> is a method to access the text of the QTextEdit
-
-
-# test
-# app = QApplication([])
-# win = MainWindow()
-# win.show()
-# app.exec()
