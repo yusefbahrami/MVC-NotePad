@@ -26,20 +26,35 @@ class MainWindow(QMainWindow):
     def toolStripMenu(self):
         self.menu = self.menuBar()
 
+        # File menu
         self.saveToolStripMenuItem = QAction("Save", self)
         self.saveToolStripMenuItem.setShortcut(QKeySequence("ctrl+s"))
         self.saveToolStripMenuItem.triggered.connect(
-            self.speakMethod)
+            self.saveMenu)
 
         self.fileToolStripMenu = self.menu.addMenu("&File")
         self.fileToolStripMenu.addAction(self.saveToolStripMenuItem)
 
+        # Run menu
+        self.speakToolStripMenuItem = QAction("Speak", self)
+        self.speakToolStripMenuItem.setShortcut(QKeySequence("ctrl+alt+s"))
+        self.speakToolStripMenuItem.triggered.connect(self.speakMethod)
+
+        self.runToolStripMenu = self.menu.addMenu("&Run")
+        self.runToolStripMenu.addAction(self.speakToolStripMenuItem)
+
     # test
     def saveMenu(self):
-        pass
+        fileTypes = "Text File (*.txt);; All File (*.*)"
+        # name will be a tuple
+        name = QFileDialog.getSaveFileName(self, "Save File", filter=fileTypes)
+        text = self.widget.txtDisplay.toPlainText()
+        try:
+            with open(name[0], 'w') as file:
+                file.write(text)
+        except FileNotFoundError:
+            pass
 
-    
     def speakMethod(self):
-        print(self.widget.txtDisplay.toPlainText())
         self.speakObject.setText(self.widget.txtDisplay.toPlainText())
         self.speakObject.start()
