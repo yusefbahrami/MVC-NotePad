@@ -1,3 +1,4 @@
+from cgitb import text
 from PyQt5.QtWidgets import QMainWindow, QAction, QStatusBar, QFileDialog
 from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QFont, QKeySequence
@@ -14,6 +15,9 @@ class MainWindow(QMainWindow):
         self.resize(600, 400)
         self.speakObject = speakObject
         self.toolStripMenu()
+
+        # using in file dialogs
+        self.fileTypes = "Text File (*.txt);; All File (*.*)"
 
         # self.fileToolStripMenu.triggered.connect(self.onMyToolBarButtonClick)
 
@@ -32,8 +36,14 @@ class MainWindow(QMainWindow):
         self.saveToolStripMenuItem.triggered.connect(
             self.saveMenu)
 
+        self.openToolStripMenuItem = QAction("Open", self)
+        self.openToolStripMenuItem.setShortcut(QKeySequence("ctrl+o"))
+        self.openToolStripMenuItem.triggered.connect(
+            self.openMenu)
+
         self.fileToolStripMenu = self.menu.addMenu("&File")
         self.fileToolStripMenu.addAction(self.saveToolStripMenuItem)
+        self.fileToolStripMenu.addAction(self.openToolStripMenuItem)
 
         # Run menu
         self.speakToolStripMenuItem = QAction("Speak", self)
@@ -45,13 +55,27 @@ class MainWindow(QMainWindow):
 
     # test
     def saveMenu(self):
-        fileTypes = "Text File (*.txt);; All File (*.*)"
         # name will be a tuple
-        name = QFileDialog.getSaveFileName(self, "Save File", filter=fileTypes)
+        fileName = QFileDialog.getSaveFileName(
+            self, "Save File", filter=self.fileTypes)
         text = self.widget.txtDisplay.toPlainText()
         try:
-            with open(name[0], 'w') as file:
+            with open(fileName[0], 'w') as file:
                 file.write(text)
+        except FileNotFoundError:
+            pass
+
+    def openMenu(self):
+        # print('in open menu')
+        fileName = QFileDialog.getOpenFileName(
+            self, "Open File", filter=self.fileTypes)
+
+        try:
+            with open(fileName[0], 'r') as file:
+                text = tuple(file.readlines())
+                for line in text:
+                    self.widget.txtDisplay.setText(
+                        f"{self.widget.txtDisplay.toPlainText()}{line.strip()}\n")
         except FileNotFoundError:
             pass
 
