@@ -1,4 +1,3 @@
-from cgitb import text
 from PyQt5.QtWidgets import QMainWindow, QAction, QStatusBar, QFileDialog
 from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QFont, QKeySequence
@@ -18,6 +17,8 @@ class MainWindow(QMainWindow):
 
         # using in file dialogs
         self.fileTypes = "Text File (*.txt);; All File (*.*)"
+        self.fileName = None
+        self.isSaved = False
 
         # self.fileToolStripMenu.triggered.connect(self.onMyToolBarButtonClick)
 
@@ -27,14 +28,20 @@ class MainWindow(QMainWindow):
         self.widget = CentralWidget()
         self.setCentralWidget(self.widget)
 
+        self.widget.txtDisplay.textChanged.connect(self.textChanged)
+
     def toolStripMenu(self):
         self.menu = self.menuBar()
 
         # File menu
+        self.newToolStripMenuItem = QAction("New", self)
+        self.newToolStripMenuItem.setShortcut(QKeySequence("ctrl+n"))
+        self.newToolStripMenuItem.triggered.connect(self.newDocument)
+
         self.saveToolStripMenuItem = QAction("Save", self)
         self.saveToolStripMenuItem.setShortcut(QKeySequence("ctrl+s"))
         self.saveToolStripMenuItem.triggered.connect(
-            self.saveMenu)
+            self.isFirstSave)
 
         self.openToolStripMenuItem = QAction("Open", self)
         self.openToolStripMenuItem.setShortcut(QKeySequence("ctrl+o"))
@@ -42,6 +49,7 @@ class MainWindow(QMainWindow):
             self.openMenu)
 
         self.fileToolStripMenu = self.menu.addMenu("&File")
+        self.fileToolStripMenu.addAction(self.newToolStripMenuItem)
         self.fileToolStripMenu.addAction(self.saveToolStripMenuItem)
         self.fileToolStripMenu.addAction(self.openToolStripMenuItem)
 
@@ -53,29 +61,44 @@ class MainWindow(QMainWindow):
         self.runToolStripMenu = self.menu.addMenu("&Run")
         self.runToolStripMenu.addAction(self.speakToolStripMenuItem)
 
-    # test
-    def saveMenu(self):
-        # name will be a tuple
-        fileName = QFileDialog.getSaveFileName(
-            self, "Save File", filter=self.fileTypes)
-        text = self.widget.txtDisplay.toPlainText()
+    def textChanged(self):
+        self.isSaved = False
+
+    def newDocument(self):
+        print("in new")
+
+    # save region
+    def handleSaveFile(self):
         try:
-            with open(fileName[0], 'w') as file:
-                file.write(text)
+            with open(self.fileName[0], 'w') as file:
+                file.write(self.widget.txtDisplay.toPlainText())
+            self.isSaved = True
         except FileNotFoundError:
             pass
 
-    def openMenu(self):
-        # print('in open menu')
-        fileName = QFileDialog.getOpenFileName(
-            self, "Open File", filter=self.fileTypes)
+    def isFirstSave(self):
+        if self.fileName and self.fileName[0] != '':
+            self.handleSaveFile()
+        else:
+            self.saveMenu()
 
+    def saveMenu(self):
+        # self.fileName will be a tuple
+        self.fileName = QFileDialog.getSaveFileName(
+            self, "Save File", filter=self.fileTypes)
+        self.handleSaveFile()
+    # end save region
+
+    def openMenu(self):
+        self.fileName = QFileDialog.getOpenFileName(
+            self, "Open File", filter=self.fileTypes)
         try:
-            with open(fileName[0], 'r') as file:
+            with open(self.fileName[0], 'r') as file:
                 text = tuple(file.readlines())
                 for line in text:
                     self.widget.txtDisplay.setText(
                         f"{self.widget.txtDisplay.toPlainText()}{line.strip()}\n")
+            self.isSaved = True
         except FileNotFoundError:
             pass
 
