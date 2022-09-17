@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QAction, QStatusBar, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QAction, QStatusBar, QFileDialog, QMessageBox
 from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QFont, QKeySequence
 from CentralWidget import CentralWidget
@@ -18,7 +18,7 @@ class MainWindow(QMainWindow):
         # using in file dialogs
         self.fileTypes = "Text File (*.txt);; All File (*.*)"
         self.fileName = None
-        self.isSaved = False
+        self.isSaved = True
 
         # self.fileToolStripMenu.triggered.connect(self.onMyToolBarButtonClick)
 
@@ -38,20 +38,24 @@ class MainWindow(QMainWindow):
         self.newToolStripMenuItem.setShortcut(QKeySequence("ctrl+n"))
         self.newToolStripMenuItem.triggered.connect(self.newDocument)
 
+        self.openToolStripMenuItem = QAction("Open", self)
+        self.openToolStripMenuItem.setShortcut(QKeySequence("ctrl+o"))
+        self.openToolStripMenuItem.triggered.connect(
+            self.openMenu)
         self.saveToolStripMenuItem = QAction("Save", self)
         self.saveToolStripMenuItem.setShortcut(QKeySequence("ctrl+s"))
         self.saveToolStripMenuItem.triggered.connect(
             self.isFirstSave)
 
-        self.openToolStripMenuItem = QAction("Open", self)
-        self.openToolStripMenuItem.setShortcut(QKeySequence("ctrl+o"))
-        self.openToolStripMenuItem.triggered.connect(
-            self.openMenu)
+        self.saveAsToolStripMenuItem = QAction("SaveAs", self)
+        self.saveAsToolStripMenuItem.setShortcut(QKeySequence("ctrl+shift+s"))
+        self.saveAsToolStripMenuItem.triggered.connect(self.saveMenu)
 
         self.fileToolStripMenu = self.menu.addMenu("&File")
         self.fileToolStripMenu.addAction(self.newToolStripMenuItem)
-        self.fileToolStripMenu.addAction(self.saveToolStripMenuItem)
         self.fileToolStripMenu.addAction(self.openToolStripMenuItem)
+        self.fileToolStripMenu.addAction(self.saveToolStripMenuItem)
+        self.fileToolStripMenu.addAction(self.saveAsToolStripMenuItem)
 
         # Run menu
         self.speakToolStripMenuItem = QAction("Speak", self)
@@ -65,9 +69,22 @@ class MainWindow(QMainWindow):
         self.isSaved = False
 
     def newDocument(self):
-        print("in new")
+        if self.isSaved == False:
+            msgBox = QMessageBox()
+            msgBox.setWindowTitle("Save?")
+            msgBox.setIcon(QMessageBox.Question)
+            msgBox.setText("Do You Want to Save?")
+            msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+            msgBoxValue = msgBox.exec()
+
+            if msgBoxValue == QMessageBox.Save:
+                self.isFirstSave()
+        self.fileName = None
+        self.isSaved = False
+        self.widget.txtDisplay.setText("")
 
     # save region
+
     def handleSaveFile(self):
         try:
             with open(self.fileName[0], 'w') as file:
@@ -90,6 +107,7 @@ class MainWindow(QMainWindow):
     # end save region
 
     def openMenu(self):
+        self.newDocument()
         self.fileName = QFileDialog.getOpenFileName(
             self, "Open File", filter=self.fileTypes)
         try:
