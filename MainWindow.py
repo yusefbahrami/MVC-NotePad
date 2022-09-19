@@ -63,6 +63,16 @@ class MainWindow(QMainWindow):
         self.fileToolStripMenu.addSeparator()
         self.fileToolStripMenu.addAction(self.exitToolStripMenuItem)
 
+        # View menu
+        self.wordWrapToolStripMenuItem = QAction("Word Wrap", self)
+        self.wordWrapToolStripMenuItem.setShortcut(QKeySequence("alt+z"))
+        self.wordWrapToolStripMenuItem.setCheckable(True)
+        self.wordWrapToolStripMenuItem.setChecked(False)
+        self.wordWrapToolStripMenuItem.triggered.connect(self.setWordWrap)
+
+        self.viewToolStripMenu = self.menu.addMenu("&View")
+        self.viewToolStripMenu.addAction(self.wordWrapToolStripMenuItem)
+
         # Run menu
         self.speakToolStripMenuItem = QAction("Speak", self)
         self.speakToolStripMenuItem.setShortcut(QKeySequence("ctrl+alt+s"))
@@ -137,6 +147,9 @@ class MainWindow(QMainWindow):
     def exitFunction(self):
         self.newDocument()
         exit()
+
+    def setWordWrap(self):
+        print("in word wrap")
 
     def speakMethod(self):
         self.speakObject.setText(self.widget.txtDisplay.toPlainText())
