@@ -51,11 +51,17 @@ class MainWindow(QMainWindow):
         self.saveAsToolStripMenuItem.setShortcut(QKeySequence("ctrl+shift+s"))
         self.saveAsToolStripMenuItem.triggered.connect(self.saveMenu)
 
+        self.exitToolStripMenuItem = QAction("Exit", self)
+        self.exitToolStripMenuItem.setShortcut(QKeySequence("alt+x"))
+        self.exitToolStripMenuItem.triggered.connect(self.exitFunction)
+
         self.fileToolStripMenu = self.menu.addMenu("&File")
         self.fileToolStripMenu.addAction(self.newToolStripMenuItem)
         self.fileToolStripMenu.addAction(self.openToolStripMenuItem)
         self.fileToolStripMenu.addAction(self.saveToolStripMenuItem)
         self.fileToolStripMenu.addAction(self.saveAsToolStripMenuItem)
+        self.fileToolStripMenu.addSeparator()
+        self.fileToolStripMenu.addAction(self.exitToolStripMenuItem)
 
         # Run menu
         self.speakToolStripMenuItem = QAction("Speak", self)
@@ -68,20 +74,28 @@ class MainWindow(QMainWindow):
     def textChanged(self):
         self.isSaved = False
 
+    def resetDocuemnt(self):
+        self.widget.txtDisplay.setText("")
+        self.fileName = None
+        self.isSaved = True
+
     def newDocument(self):
         if self.isSaved == False:
             msgBox = QMessageBox()
             msgBox.setWindowTitle("Save?")
             msgBox.setIcon(QMessageBox.Question)
             msgBox.setText("Do You Want to Save?")
-            msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+            msgBox.setStandardButtons(
+                QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
             msgBoxValue = msgBox.exec()
-
-            if msgBoxValue == QMessageBox.Save:
+            if msgBoxValue == QMessageBox.Yes:
                 self.isFirstSave()
-        self.fileName = None
-        self.isSaved = False
-        self.widget.txtDisplay.setText("")
+                self.resetDocuemnt()
+            elif msgBoxValue == QMessageBox.No:
+                self.resetDocuemnt()
+
+        elif self.isSaved == True:
+            self.resetDocuemnt()
 
     # save region
 
@@ -119,6 +133,10 @@ class MainWindow(QMainWindow):
             self.isSaved = True
         except FileNotFoundError:
             pass
+
+    def exitFunction(self):
+        self.newDocument()
+        exit()
 
     def speakMethod(self):
         self.speakObject.setText(self.widget.txtDisplay.toPlainText())
